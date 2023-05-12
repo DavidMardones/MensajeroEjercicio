@@ -28,35 +28,39 @@ namespace MensajeroModel.DAL
             }
 
         }
-            public List<Mensaje> ObtenerMensajes()
+        public List<Mensaje> ObtenerMensajes()
+        {
+            List<Mensaje> Lista = new List<Mensaje>();
+            try
             {
-                List<Mensaje> Lista = new List<Mensaje>();
-                try
+                using (StreamReader read = new StreamReader(archivo))
                 {
-                    using (StreamReader read = new StreamReader(archivo))
+                    string texto = "";
+                    do
                     {
-                        string texto = "";
-                        do
+                        texto = read.ReadLine();
+                        if (texto != null)
                         {
-                            texto = read.ReadLine();
-                            if (texto != null)
+                            string[] arr = texto.Trim().Split(';');
+                            Mensaje mensaje = new Mensaje()
                             {
-                                string[] arr = texto.Trim().Split(';');
-                                Mensaje mensaje = new Mensaje()
-                                {
-                                    Nombre = arr[0],
-                                    Texto = arr[1],
-                                    Tipo = arr[2]
-                                };
+                                Nombre = arr[0],
+                                Texto = arr[1],
+                                Tipo = arr[2]
+                            };
+
+                        }
+
+                    } while (texto != null);
+                }
 
 
-                        } while (texto != null);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Lista = null;
-                }
+
+            }
+            catch (Exception ex)
+            {
+                Lista = null;
+            }
                 return Lista;
             }
 
