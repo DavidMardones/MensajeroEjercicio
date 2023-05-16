@@ -10,6 +10,26 @@ namespace MensajeroModel.DAL
 {
     public class MensajesDALArchivos : IMensajesDAL
     {
+        //Implementar Singleton:
+        //1. Constructor tiene que ser private
+        private MensajesDALArchivos() { }
+
+        //2. Debe poseer un atributo del mismo tipo de la clase y estatico
+        private static MensajesDALArchivos instancia;
+        //3. Tener un metodo getInstance, que devuelva una referencia al atributo
+        public static IMensajesDAL GetInstancia()
+        {
+            if (instancia == null)
+            {
+                instancia = new MensajesDALArchivos();
+            }
+            return instancia;
+        }
+        //Como vamos a hacer para que 2 hebras no accedan a la vez a este archivo¿?
+
+
+
+
         private static string url = Directory.GetCurrentDirectory();
         private static string archivo = url + "/mensajes.txt";
         public void AgregarMensaje(Mensaje mensaje)
@@ -45,7 +65,7 @@ namespace MensajeroModel.DAL
                             Mensaje mensaje = new Mensaje()
                             {
                                 Nombre = arr[0],
-                                Texto = arr[1],
+                                Texto = arr[1],         
                                 Tipo = arr[2]
                             };
 
