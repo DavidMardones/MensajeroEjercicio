@@ -1,8 +1,11 @@
 ﻿using MensajeroModel.DAL;
 using MensajeroModel.DTO;
+using ServidorSocketUtils;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,8 +33,39 @@ namespace Mensajero
             }
             return continuar;
         }
+
+        static void IniciarServidor()
+        {
+            int puerto = Convert.ToInt32(ConfigurationManager.AppSettings["puerto"]);
+            ServerSocket servidor = new ServerSocket(puerto);
+            Console.WriteLine("S: Servidor iniciado en puerto {0}", puerto);
+            if (servidor.Iniciar())
+            {
+                {
+                    while (true)
+                    {
+                        Console.WriteLine("S: Esperando cliente...");
+                        Socket cliente = servidor.ObtenerCliente();
+                        Console.WriteLine("S: Cliente recibido");
+                        ClienteCom clienteCom = new ClienteCom(cliente);
+                        clienteCom.Escribir("Ingrese nombre: ");
+                        string nombre = clienteCom.Leer();
+                        clienteCom.Escribir("Ingrese texto: ");
+                        string texto = clienteCom.Leer();
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Fallo, no se puede iniciar server en {0}", puerto);
+            }
+        }
         static void Main(string[] args)
         {
+            //1. Iniciar el servidor Socket en el puerto 3000
+            //2. El puerto tiene que ser configurable App.Config
+            //3. Cuando reciba un cliente, tiene que solicitar a ese cliente el nombre, texto y agregar
+            // Mensaje con el tipo TCP
             while (Menu()) ;
         }
 

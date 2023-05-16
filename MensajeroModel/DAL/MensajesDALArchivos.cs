@@ -68,6 +68,7 @@ namespace MensajeroModel.DAL
                                 Texto = arr[1],         
                                 Tipo = arr[2]
                             };
+                            Lista.Add(mensaje);
 
                         }
 
