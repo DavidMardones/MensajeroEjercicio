@@ -10,13 +10,13 @@ namespace MensajeroModel.DAL
 {
     public class MensajesDALArchivos : IMensajesDAL
     {
-        //Implementar Singleton:
-        //1. Constructor tiene que ser private
+        //implementar Singleton:
+        //1. Contructor tiene que ser private
         private MensajesDALArchivos() { }
 
         //2. Debe poseer un atributo del mismo tipo de la clase y estatico
         private static MensajesDALArchivos instancia;
-        //3. Tener un metodo getInstance, que devuelva una referencia al atributo
+        //3. tener un metodo getIntance, que de vuelva una referencia al atributo
         public static IMensajesDAL GetInstancia()
         {
             if (instancia == null)
@@ -25,9 +25,7 @@ namespace MensajeroModel.DAL
             }
             return instancia;
         }
-        //Como vamos a hacer para que 2 hebras no accedan a la vez a este archivo¿?
-
-
+        //como vamos a hacer para que 2 hebras no accedan a la vez a este archivo?????
 
 
         private static string url = Directory.GetCurrentDirectory();
@@ -46,11 +44,11 @@ namespace MensajeroModel.DAL
             {
 
             }
-
         }
+
         public List<Mensaje> ObtenerMensajes()
         {
-            List<Mensaje> Lista = new List<Mensaje>();
+            List<Mensaje> lista = new List<Mensaje>();
             try
             {
                 using (StreamReader read = new StreamReader(archivo))
@@ -65,28 +63,23 @@ namespace MensajeroModel.DAL
                             Mensaje mensaje = new Mensaje()
                             {
                                 Nombre = arr[0],
-                                Texto = arr[1],         
+                                Texto = arr[1],
                                 Tipo = arr[2]
                             };
-                            Lista.Add(mensaje);
-
+                            lista.Add(mensaje);
                         }
 
                     } while (texto != null);
                 }
 
-
-
             }
             catch (Exception ex)
             {
-                Lista = null;
+                lista = null;
             }
-                return Lista;
-            }
-
+            return lista;
         }
 
+
     }
-
-
+}

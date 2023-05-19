@@ -1,4 +1,5 @@
-﻿using MensajeroModel.DAL;
+﻿using Mensajero.Comunicacion;
+using MensajeroModel.DAL;
 using MensajeroModel.DTO;
 using ServidorSocketUtils;
 using System;
@@ -7,6 +8,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mensajero
@@ -19,7 +21,7 @@ namespace Mensajero
         {
             bool continuar = true;
             Console.WriteLine("Selecciones una opcion");
-            Console.WriteLine("1. Ingresar \n 2. \n 0.Salir");
+            Console.WriteLine(" 1. Ingresar \n 2. Mostrar \n 0. Salir");
             switch(Console.ReadLine().Trim())
             {
                 case "1": Ingresar();
@@ -36,29 +38,8 @@ namespace Mensajero
 
         static void IniciarServidor()
         {
-            int puerto = Convert.ToInt32(ConfigurationManager.AppSettings["puerto"]);
-            ServerSocket servidor = new ServerSocket(puerto);
-            Console.WriteLine("S: Servidor iniciado en puerto {0}", puerto);
-            if (servidor.Iniciar())
-            {
-                {
-                    while (true)
-                    {
-                        Console.WriteLine("S: Esperando cliente...");
-                        Socket cliente = servidor.ObtenerCliente();
-                        Console.WriteLine("S: Cliente recibido");
-                        ClienteCom clienteCom = new ClienteCom(cliente);
-                        clienteCom.Escribir("Ingrese nombre: ");
-                        string nombre = clienteCom.Leer();
-                        clienteCom.Escribir("Ingrese texto: ");
-                        string texto = clienteCom.Leer();
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("Fallo, no se puede iniciar server en {0}", puerto);
-            }
+           
+
         }
         static void Main(string[] args)
         {
@@ -66,6 +47,13 @@ namespace Mensajero
             //2. El puerto tiene que ser configurable App.Config
             //3. Cuando reciba un cliente, tiene que solicitar a ese cliente el nombre, texto y agregar
             // Mensaje con el tipo TCP
+            //IniciarServidor();
+            HebraServidor hebra = new HebraServidor();
+            Thread t = new Thread(new ThreadStart(hebra.Ejecutar));
+            t.Start();
+            //1. Como atender mas de un cliente a la vez¿?
+            //2. Como evito que dos clientes ingresen al archivo a la vez¿?
+            //3. Como evitar el bloqueo mutuo¿?
             while (Menu()) ;
         }
 
@@ -81,12 +69,19 @@ namespace Mensajero
                 Texto = texto,
                 Tipo = "Aplicacion"
             };
-            mensajesDAL.AgregarMensaje(mensaje);
+            lock (mensajesDAL)
+            {
+                mensajesDAL.AgregarMensaje(mensaje);
+            }
         }
 
         static void Mostrar()
         {
-            List<Mensaje> mensajes = mensajesDAL.ObtenerMensajes();
+            List<Mensaje> mensajes = null;
+                lock (mensajesDAL)
+            {
+                mensajes = mensajesDAL.ObtenerMensajes();
+            }
             foreach(Mensaje mensaje in mensajes)
             {
                 Console.WriteLine(mensaje);
